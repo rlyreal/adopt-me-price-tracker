@@ -73,6 +73,17 @@ button:disabled { cursor: wait; opacity: .65; }
 .hero-cta:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 12px 22px rgba(239, 111, 90, .28); }
 .hero-button-image { display: block; width: min(100%, 180px); height: auto; border-radius: 8px; filter: drop-shadow(0 8px 12px rgba(239, 111, 90, 0.18)); }
 .hero-note { margin: .75rem 0 0; color: #687277; font-size: .75rem; }
+.landing-reveal { opacity: 0; transition: opacity .8s ease, transform .8s cubic-bezier(.22, 1, .36, 1); }
+.landing-reveal.is-visible { opacity: 1; transform: none; }
+.landing-reveal-up { transform: translateY(24px); }
+.landing-reveal-scale { transform: scale(.96) translateY(18px); transition-delay: .12s; }
+.landing-reveal-left { transform: translateX(-34px); }
+.landing-reveal-right { transform: translateX(34px); transition-delay: .12s; }
+.landing-reveal-delay-1 { transition-delay: .08s; }
+.landing-reveal-delay-2 { transition-delay: .18s; }
+.landing-reveal-delay-3 { transition-delay: .28s; }
+.typing-caret { display: inline-block; width: .08em; height: .85em; margin-left: .12em; vertical-align: -.08em; background: #e73d8b; animation: typing-blink .85s steps(1) infinite; }
+@keyframes typing-blink { 50% { opacity: 0; } }
 .cloud-divider { margin-top: 4rem; margin-bottom: -7rem; background: transparent; }
 .cloud-divider-image { top: -6rem; left: 50%; width: 100vw; min-width: 100vw; height: calc(100% + 2rem); transform: translateX(-50%); object-fit: fill; object-position: center; }
 .landing-feature-band { position: relative; padding-top: 8rem; }
@@ -80,6 +91,10 @@ button:disabled { cursor: wait; opacity: .65; }
 .footer-log-divider { margin-bottom: -1px; background: #1f2326; }
 .tree-divider { background: #f4f2ec; }
 .tree-divider::before { content: ''; position: absolute; z-index: 0; top: 0; left: -6%; width: 112%; height: 82%; border-radius: 0 0 50% 50% / 0 0 42% 42%; background: #1f2326; }
+@media (prefers-reduced-motion: reduce) {
+	.landing-reveal { opacity: 1; transform: none; transition: none; }
+	.typing-caret { animation: none; }
+}
 
 .theme-dark { color: #eef5f2; }
 .theme-dark.bg-canvas,

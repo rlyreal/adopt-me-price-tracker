@@ -1,4 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL || '/api'
+const configuredApiUrl = import.meta.env.VITE_API_URL
+const defaultApiUrl = typeof window !== 'undefined' && window.location.protocol === 'file:'
+  ? 'http://localhost:4000/api'
+  : '/api'
+const API_URL = (configuredApiUrl || defaultApiUrl).replace(/\/$/, '')
 
 export function getToken() {
   return localStorage.getItem('petfolio_token')
@@ -15,13 +19,20 @@ async function request(path, options = {}) {
   const isFormData = options.body instanceof FormData
   if (!isFormData) headers.set('Content-Type', 'application/json')
   const body = !isFormData && options.body && typeof options.body !== 'string' ? JSON.stringify(options.body) : options.body
-  const response = await fetch(`${API_URL}${path}`, { ...options, body, headers })
+  let response
+  try {
+    response = await fetch(`${API_URL}${path}`, { ...options, body, headers })
+  } catch {
+    throw new Error(`Unable to reach the API at ${API_URL}. Start the server or set VITE_API_URL.`)
+  }
   if (response.status === 401) {
     logout()
     window.dispatchEvent(new Event('auth-expired'))
   }
   const payload = response.status === 204 ? null : await response.json().catch(() => ({}))
-  if (!response.ok) throw new Error(payload.error || 'Request failed')
+  if (!response.ok) {
+    throw new Error(payload.error || `Request failed (${response.status})`)
+  }
   return payload
 }
 
