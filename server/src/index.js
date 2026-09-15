@@ -7,12 +7,12 @@ import { petsRouter } from './routes/pets.js'
 
 const app = express()
 const port = process.env.PORT || 4000
-const allowedOrigins = process.env.CLIENT_ORIGIN?.split(',').map((origin) => origin.trim()).filter(Boolean) || []
+const allowedOrigins = process.env.CLIENT_ORIGIN?.split(',').map((origin) => origin.trim().replace(/\/$/, '')).filter(Boolean) || []
 
 app.use(cors({
   origin: (origin, callback) => {
     const isLocalDevelopment = process.env.VERCEL !== '1' && /^http:\/\/localhost:\d+$/.test(origin || '')
-    if (!origin || isLocalDevelopment || allowedOrigins.includes(origin)) return callback(null, true)
+    if (!origin || isLocalDevelopment || allowedOrigins.includes(origin.replace(/\/$/, ''))) return callback(null, true)
     return callback(new Error('Origin is not allowed'))
   }
 }))
