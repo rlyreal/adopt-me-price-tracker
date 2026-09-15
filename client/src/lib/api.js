@@ -12,8 +12,10 @@ async function request(path, options = {}) {
   const headers = new Headers(options.headers)
   const token = getToken()
   if (token) headers.set('Authorization', `Bearer ${token}`)
-  if (!(options.body instanceof FormData)) headers.set('Content-Type', 'application/json')
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers })
+  const isFormData = options.body instanceof FormData
+  if (!isFormData) headers.set('Content-Type', 'application/json')
+  const body = !isFormData && options.body && typeof options.body !== 'string' ? JSON.stringify(options.body) : options.body
+  const response = await fetch(`${API_URL}${path}`, { ...options, body, headers })
   if (response.status === 401) {
     logout()
     window.dispatchEvent(new Event('auth-expired'))
