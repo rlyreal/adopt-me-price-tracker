@@ -49,6 +49,7 @@ export const api = {
   login: (password) => request('/login', { method: 'POST', body: JSON.stringify({ password }) }),
   listPets: (params) => request(`/pets?${new URLSearchParams(params)}`),
   createPet: (data) => request('/pets', { method: 'POST', body: petFormData(data) }),
+  importPets: (pets) => request('/pets/import', { method: 'POST', body: { pets } }),
   updatePet: (id, data) => request(`/pets/${id}`, { method: 'PUT', body: petFormData(data) }),
   deletePet: (id) => request(`/pets/${id}`, { method: 'DELETE' })
 }

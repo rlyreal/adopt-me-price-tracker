@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { LogIn, LogOut, Plus, Search, SlidersHorizontal, PawPrint, ArrowDownUp, RefreshCw, X, Sparkles, ShieldCheck, LockKeyhole, ArrowDown, ExternalLink, Moon, Sun, CheckCircle2, LoaderCircle, Play, Instagram, Github, Facebook } from 'lucide-react'
+import { LogIn, LogOut, Plus, Search, SlidersHorizontal, PawPrint, ArrowDownUp, RefreshCw, X, Sparkles, ShieldCheck, LockKeyhole, ArrowDown, ExternalLink, Moon, Sun, CheckCircle2, LoaderCircle, Play, Instagram, Github, Facebook, Upload } from 'lucide-react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { api, getToken, logout } from './lib/api.js'
 import Modal from './components/Modal.jsx'
 import PetCard from './components/PetCard.jsx'
 import PetForm from './components/PetForm.jsx'
+import PetImport from './components/PetImport.jsx'
 
 const emptyFilters = { search: '', rarity: '', category: '', sort: 'updated' }
 
@@ -324,6 +325,7 @@ function Dashboard() {
   const [pendingDelete, setPendingDelete] = useState(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [importing, setImporting] = useState(false)
   const [exiting, setExiting] = useState(false)
   const { theme, toggleTheme } = useTheme()
 
@@ -334,6 +336,7 @@ function Dashboard() {
   const showToast = (message, type = 'success') => setToast({ message, type })
   const updateFilter = (key, value) => setFilters((current) => ({ ...current, [key]: value }))
   const handleSave = async (data) => { if (data?.__logout) { setExiting(true); setTimeout(() => { logout(); navigate('/login', { replace: true }) }, 700); return }; setSubmitting(true); try { if (modal?.pet) { await api.updatePet(modal.pet.id, data); showToast('Pet details updated') } else { await api.createPet(data); showToast('Pet added to your collection') }; setModal(null); await loadPets() } catch (error) { showToast(error.message, 'error') } finally { setSubmitting(false) } }
+  const handleImport = async (importedPets) => { setImporting(true); try { await api.importPets(importedPets); showToast(`${importedPets.length} pets imported`); setModal(null); await loadPets() } catch (error) { showToast(error.message, 'error') } finally { setImporting(false) } }
   const handleDelete = (pet) => setPendingDelete(pet)
     const confirmDelete = async () => { if (!pendingDelete) return; const pet = pendingDelete; setPendingDelete(null); try { await api.deletePet(pet.id); showToast(`${pet.name} removed`); await loadPets() } catch (error) { showToast(error.message, 'error') } }
   const signOut = () => setModal({ type: 'edit', pet: { __logout: true, name: 'Exit?' } })
@@ -362,8 +365,11 @@ function Dashboard() {
               <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Pet values, <span className="text-coral">beautifully</span> kept.</h1>
               <p className="mt-3 max-w-xl text-sm leading-6 text-moss sm:text-base">A living snapshot of your Adopt Me collection, ready whenever a trade comes up.</p>
               <div className="hero-actions-row">
-                <button className="button button-primary shrink-0" onClick={() => setModal({ type: 'add' })}>
-                  <Plus size={18} /> Add pet
+                <button className="button button-primary shrink-0" onClick={() => setModal({ type: 'add', itemType: 'pet' })}>
+                  <Plus size={18} /> Add
+                </button>
+                <button className="button button-quiet premium-soft-button shrink-0" onClick={() => setModal({ type: 'import' })}>
+                  <Upload size={17} /> Import CSV
                 </button>
                 <button className="button button-quiet premium-soft-button" title="Refresh collection" onClick={loadPets}>
                   <RefreshCw size={17} /> Refresh
@@ -460,8 +466,8 @@ function Dashboard() {
           )}
         </main>
         {modal && (
-          <Modal eyebrow={modal.type === 'edit' ? 'Edit listing' : 'New listing'} title={modal.type === 'edit' ? `Update ${modal.pet.name}` : 'Add a pet'} onClose={() => setModal(null)}>
-            <PetForm pet={modal.pet} onSubmit={handleSave} onCancel={() => setModal(null)} submitting={submitting} />
+          <Modal eyebrow={modal.type === 'edit' ? 'Edit listing' : modal.type === 'import' ? 'Bulk import' : 'New listing'} title={modal.type === 'edit' ? `Update ${modal.pet.name}` : modal.type === 'import' ? 'Import items' : modal.itemType === 'egg' ? 'Add an egg' : modal.itemType === 'potion' ? 'Add a potion' : 'Add a pet'} onClose={() => setModal(null)}>
+            {modal.type === 'import' ? <PetImport onClose={() => setModal(null)} onImport={handleImport} submitting={importing} /> : <PetForm pet={modal.pet} itemType={modal.itemType} onItemTypeChange={(itemType) => setModal((current) => ({ ...current, itemType }))} onSubmit={handleSave} onCancel={() => setModal(null)} submitting={submitting} />}
           </Modal>
         )}
             {pendingDelete && <Modal eyebrow="Confirm action" title={`Delete ${pendingDelete.name}?`} onClose={() => setPendingDelete(null)}><div className="space-y-5"><p className="text-sm leading-6 text-moss">This pet will be permanently removed from your collection.</p><div className="flex justify-end gap-3 border-t border-ink/10 pt-5"><button type="button" className="button button-quiet" onClick={() => setPendingDelete(null)}>Cancel</button><button type="button" className="flex min-h-11 items-center justify-center rounded-xl bg-[#ff735c] px-5 font-bold text-white shadow-lg shadow-[#ff735c]/20 transition hover:-translate-y-0.5 hover:bg-[#e85d49]" onClick={confirmDelete}>Delete pet</button></div></div></Modal>}
