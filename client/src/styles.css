@@ -104,7 +104,7 @@ button:disabled { cursor: wait; opacity: .65; }
   content: "";
   position: absolute;
   inset: 0 auto auto 50%;
-  width: 35rem;
+  width: min(35rem, 100vw);
   height: 35rem;
   transform: translateX(-50%);
   border-radius: 50%;
@@ -604,6 +604,8 @@ input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-o
 	.landing-feature-band img { max-height: 24rem; }
 }
 @media (max-width: 560px) {
+  .landing-header { gap: .5rem; padding-inline: 1rem; }
+  .landing-version { display: none; }
 	.page-wrap { width: min(100% - 1.5rem, 1200px); padding-top: 2.5rem; }
 	.hero-row { align-items: stretch; flex-direction: column; }
 	.hero-row .button { width: 100%; }

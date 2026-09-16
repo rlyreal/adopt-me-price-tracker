@@ -96,7 +96,7 @@ function Login() {
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1f2326] text-mint"><PawPrint size={18} strokeWidth={2.5} /></span>
           <div className="flex items-center gap-2">
             <span className="font-display text-xl font-extrabold text-white sm:text-2xl">Petfolio</span>
-            <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#d5e7df]">v1.0.0</span>
+            <span className="landing-version rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#d5e7df]">v1.0.0</span>
           </div>
         </div>
 
