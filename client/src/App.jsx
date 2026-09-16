@@ -38,6 +38,7 @@ function Login() {
   const [modalOpen, setModalOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const [welcomeText, setWelcomeText] = useState('')
+  const [openingTracker, setOpeningTracker] = useState(false)
   const [videoPlaying, setVideoPlaying] = useState(true)
   const videoRef = useRef(null)
 
@@ -56,6 +57,11 @@ function Login() {
     if (!videoRef.current) return
     if (videoRef.current.paused) videoRef.current.play().catch(() => {})
     else videoRef.current.pause()
+  }
+
+  const openTracker = () => {
+    setOpeningTracker(true)
+    setTimeout(() => navigate('/'), 700)
   }
 
   useEffect(() => {
@@ -94,7 +100,7 @@ function Login() {
       <header className="flex items-center justify-between gap-4 bg-[#1f2326]/95 px-5 py-4 backdrop-blur sm:px-9">
         <div className="flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1f2326] text-mint"><PawPrint size={18} strokeWidth={2.5} /></span>
-          <div className="flex items-center gap-2">
+          <div className="landing-brand-stack flex items-center gap-2">
             <span className="font-display text-xl font-extrabold text-white sm:text-2xl">Petfolio</span>
             <span className="landing-version rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#d5e7df]">v1.0.0</span>
           </div>
@@ -102,9 +108,9 @@ function Login() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <button type="button" className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-b from-[#ff5f9d] to-[#e73d8b] px-3 py-2.5 pr-4 font-bold text-white shadow-lg shadow-[#db4e8a]/25 transition hover:-translate-y-0.5" onClick={() => setModalOpen(true)}>
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white"><LogIn size={16} /></span>
-            <span>Log in</span>
+          <button type="button" className="landing-login-button landing-open-tracker" onClick={openTracker} disabled={openingTracker}>
+            <span className="dashboard-action-icon"><LogIn size={16} /></span>
+            <span>Open Tracker</span>
           </button>
         </div>
       </header>
@@ -212,21 +218,36 @@ function Login() {
             <p className="mb-3 text-xs font-extrabold uppercase tracking-[.2em] text-[#e73d8b]">A calmer way to track</p>
             <h2 className="font-display text-4xl font-bold leading-tight text-[#1f2326] sm:text-5xl">Everything you need, nothing in the way.</h2>
           </div>
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             <article className="landing-reveal landing-reveal-up landing-reveal-delay-1 rounded-3xl bg-white p-7 shadow-[0_16px_40px_rgba(23,33,31,.07)] transition hover:-translate-y-1" data-reveal>
               <span className="mb-12 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ffe1ed] text-[#e73d8b]"><Sparkles size={23} /></span>
-              <h3 className="font-display text-2xl font-bold text-[#1f2326]">Know your values</h3>
-              <p className="mt-3 text-sm leading-6 text-[#687277]">Keep prices, rarities, and notes together so your collection is easy to scan.</p>
+              <h3 className="font-display text-2xl font-bold text-[#1f2326]">Build your collection</h3>
+              <p className="mt-3 text-sm leading-6 text-[#687277]">Add pets, update their values, and remove old listings whenever your collection changes.</p>
             </article>
             <article className="landing-reveal landing-reveal-up landing-reveal-delay-2 rounded-3xl bg-[#b9f3d0] p-7 shadow-[0_16px_40px_rgba(23,33,31,.07)] transition hover:-translate-y-1" data-reveal>
-              <span className="mb-12 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-[#456453]"><ShieldCheck size={23} /></span>
-              <h3 className="font-display text-2xl font-bold text-[#1f2326]">Keep it private</h3>
-              <p className="mt-3 text-sm leading-6 text-[#456453]">Your collection stays behind your admin login, exactly where it belongs.</p>
+              <span className="mb-12 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-[#456453]"><PawPrint size={23} /></span>
+              <h3 className="font-display text-2xl font-bold text-[#1f2326]">See every pet clearly</h3>
+              <p className="mt-3 text-sm leading-6 text-[#456453]">Give each listing a compact card with a full pet image, value, life stage, and quick actions.</p>
             </article>
             <article className="landing-reveal landing-reveal-up landing-reveal-delay-3 rounded-3xl bg-[#ffe1ed] p-7 shadow-[0_16px_40px_rgba(23,33,31,.07)] transition hover:-translate-y-1" data-reveal>
-              <span className="mb-12 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-[#b92b68]"><LockKeyhole size={23} /></span>
-              <h3 className="font-display text-2xl font-bold text-[#1f2326]">Ready for trades</h3>
-              <p className="mt-3 text-sm leading-6 text-[#b92b68]">Open your tracker quickly whenever a trade, update, or new pet comes up.</p>
+              <span className="mb-12 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-[#b92b68]"><ShieldCheck size={23} /></span>
+              <h3 className="font-display text-2xl font-bold text-[#1f2326]">Track rarities and variants</h3>
+              <p className="mt-3 text-sm leading-6 text-[#b92b68]">Highlight Common through Legendary pets and mark Neon, Mega, Fly, and Ride at a glance.</p>
+            </article>
+            <article className="landing-reveal landing-reveal-up landing-reveal-delay-1 rounded-3xl bg-white p-7 shadow-[0_16px_40px_rgba(23,33,31,.07)] transition hover:-translate-y-1" data-reveal>
+              <span className="mb-12 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e1f3ff] text-[#168dca]"><Search size={23} /></span>
+              <h3 className="font-display text-2xl font-bold text-[#1f2326]">Find pets fast</h3>
+              <p className="mt-3 text-sm leading-6 text-[#687277]">Search by name, filter by rarity or variant, and sort your collection by name, price, or latest update.</p>
+            </article>
+            <article className="landing-reveal landing-reveal-up landing-reveal-delay-2 rounded-3xl bg-[#fff0c7] p-7 shadow-[0_16px_40px_rgba(23,33,31,.07)] transition hover:-translate-y-1" data-reveal>
+              <span className="mb-12 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-[#c77900]"><RefreshCw size={23} /></span>
+              <h3 className="font-display text-2xl font-bold text-[#1f2326]">Ready on every screen</h3>
+              <p className="mt-3 text-sm leading-6 text-[#765719]">Use the tracker comfortably on phones, tablets, laptops, and desktop screens with a responsive card grid.</p>
+            </article>
+            <article className="landing-reveal landing-reveal-up landing-reveal-delay-3 rounded-3xl bg-[#e9e4ff] p-7 shadow-[0_16px_40px_rgba(23,33,31,.07)] transition hover:-translate-y-1" data-reveal>
+              <span className="mb-12 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-[#6348c4]"><LockKeyhole size={23} /></span>
+              <h3 className="font-display text-2xl font-bold text-[#1f2326]">Share with friends</h3>
+              <p className="mt-3 text-sm leading-6 text-[#6348c4]">Open the tracker with your friends so everyone can help keep the collection current.</p>
             </article>
           </div>
         </div>
@@ -286,12 +307,13 @@ function Login() {
           </div>
         </div>
       )}
+      {openingTracker && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1f2326]/45 p-6 backdrop-blur-sm" role="status" aria-live="polite"><div className={`flex w-full max-w-xs flex-col items-center rounded-3xl px-8 py-9 text-center shadow-2xl shadow-[#db4e8a]/25 ${theme === 'dark' ? 'bg-[#20282a] text-[#eef5f2]' : 'bg-white text-[#1f2326]'}`}><LoaderCircle size={42} className="animate-spin text-[#e73d8b]" /><p className="mt-4 font-display text-xl font-bold">Opening tracker...</p><p className={`mt-1 text-sm ${theme === 'dark' ? 'text-[#c3d0cc]' : 'text-[#687277]'}`}>Loading your collection</p></div></div>}
       {success && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1f2326]/45 p-6 backdrop-blur-sm"><div className="flex w-full max-w-xs flex-col items-center rounded-3xl bg-white px-8 py-9 text-center shadow-2xl shadow-[#db4e8a]/25"><LoaderCircle size={42} className="animate-spin text-[#e73d8b]" /><CheckCircle2 size={22} className="mt-4 text-[#e73d8b]" /><p className="mt-2 font-display text-xl font-bold text-[#1f2326]">{success}</p><p className="mt-1 text-sm text-[#687277]">Opening your collection...</p></div></div>}
     </main>
   )
 }
 
-function Protected({ children }) { return getToken() ? children : <Navigate to="/login" replace /> }
+function Protected({ children }) { return children }
 
 function Dashboard() {
   const navigate = useNavigate()
@@ -302,6 +324,7 @@ function Dashboard() {
   const [pendingDelete, setPendingDelete] = useState(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [exiting, setExiting] = useState(false)
   const { theme, toggleTheme } = useTheme()
 
   const loadPets = async () => { setLoading(true); try { setPets(await api.listPets(filters)) } catch (error) { showToast(error.message, 'error') } finally { setLoading(false) } }
@@ -310,22 +333,25 @@ function Dashboard() {
   useEffect(() => { if (!toast) return undefined; const timer = setTimeout(() => setToast(null), 3200); return () => clearTimeout(timer) }, [toast])
   const showToast = (message, type = 'success') => setToast({ message, type })
   const updateFilter = (key, value) => setFilters((current) => ({ ...current, [key]: value }))
-  const handleSave = async (data) => { if (data?.__logout) { logout(); navigate('/login', { replace: true }); return }; setSubmitting(true); try { if (modal?.pet) { await api.updatePet(modal.pet.id, data); showToast('Pet details updated') } else { await api.createPet(data); showToast('Pet added to your collection') }; setModal(null); await loadPets() } catch (error) { showToast(error.message, 'error') } finally { setSubmitting(false) } }
+  const handleSave = async (data) => { if (data?.__logout) { setExiting(true); setTimeout(() => { logout(); navigate('/login', { replace: true }) }, 700); return }; setSubmitting(true); try { if (modal?.pet) { await api.updatePet(modal.pet.id, data); showToast('Pet details updated') } else { await api.createPet(data); showToast('Pet added to your collection') }; setModal(null); await loadPets() } catch (error) { showToast(error.message, 'error') } finally { setSubmitting(false) } }
   const handleDelete = (pet) => setPendingDelete(pet)
     const confirmDelete = async () => { if (!pendingDelete) return; const pet = pendingDelete; setPendingDelete(null); try { await api.deletePet(pet.id); showToast(`${pet.name} removed`); await loadPets() } catch (error) { showToast(error.message, 'error') } }
-  const signOut = () => setModal({ type: 'edit', pet: { __logout: true, name: 'Log out?' } })
+  const signOut = () => setModal({ type: 'edit', pet: { __logout: true, name: 'Exit?' } })
     return (
       <div className={`app-shell ${theme === 'dark' ? 'theme-dark' : ''}`}>
-        <header className="topbar premium-topbar">
-          <div className="brand premium-brand">
-            <span className="brand-icon premium-brand-icon"><PawPrint size={18} /></span>
-            <span>Petfolio</span>
+        <header className="landing-header dashboard-header">
+          <div className="landing-brand-wrap">
+            <span className="landing-logo"><PawPrint size={18} strokeWidth={2.5} /></span>
+            <div className="landing-brand-stack flex items-center gap-2">
+              <span className="font-display text-xl font-extrabold text-white sm:text-2xl">Petfolio</span>
+              <span className="landing-version rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#d5e7df]">v1.0.0</span>
+            </div>
           </div>
           <div className="topbar-right">
-            <span className="topbar-label">Private price tracker</span>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
-            <button className="logout-button premium-logout" onClick={signOut}>
-              <LogOut size={16} /> Log out
+            <button className="landing-login-button dashboard-logout" onClick={signOut}>
+              <span className="dashboard-action-icon"><LogOut size={16} /></span>
+              <span>Exit</span>
             </button>
           </div>
         </header>
@@ -392,7 +418,7 @@ function Dashboard() {
                 <select value={filters.category} onChange={(e) => updateFilter('category', e.target.value)}>
                   <option value="">All variants</option>
                   <option value="neon">Neon</option>
-                  <option value="mega">Mega Neon</option>
+                  <option value="mega">Mega</option>
                   <option value="fly">Fly</option>
                   <option value="ride">Ride</option>
                   <option value="fly_ride">Fly + Ride</option>
@@ -440,6 +466,7 @@ function Dashboard() {
         )}
             {pendingDelete && <Modal eyebrow="Confirm action" title={`Delete ${pendingDelete.name}?`} onClose={() => setPendingDelete(null)}><div className="space-y-5"><p className="text-sm leading-6 text-moss">This pet will be permanently removed from your collection.</p><div className="flex justify-end gap-3 border-t border-ink/10 pt-5"><button type="button" className="button button-quiet" onClick={() => setPendingDelete(null)}>Cancel</button><button type="button" className="flex min-h-11 items-center justify-center rounded-xl bg-[#ff735c] px-5 font-bold text-white shadow-lg shadow-[#ff735c]/20 transition hover:-translate-y-0.5 hover:bg-[#e85d49]" onClick={confirmDelete}>Delete pet</button></div></div></Modal>}
             {toast && <div className={`toast ${toast.type === 'error' ? 'toast-error' : ''}`}>{toast.message}</div>}
+            {exiting && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1f2326]/45 p-6 backdrop-blur-sm" role="status" aria-live="polite"><div className={`flex w-full max-w-xs flex-col items-center rounded-3xl px-8 py-9 text-center shadow-2xl shadow-[#db4e8a]/25 ${theme === 'dark' ? 'bg-[#20282a] text-[#eef5f2]' : 'bg-white text-[#1f2326]'}`}><LoaderCircle size={42} className="animate-spin text-[#e73d8b]" /><p className="mt-4 font-display text-xl font-bold">Exiting...</p><p className={`mt-1 text-sm ${theme === 'dark' ? 'text-[#c3d0cc]' : 'text-[#687277]'}`}>Returning to Petfolio</p></div></div>}
       </div>
     )
 }

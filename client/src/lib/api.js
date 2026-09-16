@@ -12,6 +12,15 @@ export function logout() {
   localStorage.removeItem('petfolio_token')
 }
 
+function petFormData(data) {
+  const formData = new FormData()
+  Object.entries(data).forEach(([key, value]) => {
+    if (key === 'image' && value instanceof File) formData.append('image', value)
+    else if (key !== 'image' && value !== undefined && value !== null) formData.append(key, String(value))
+  })
+  return formData
+}
+
 async function request(path, options = {}) {
   const headers = new Headers(options.headers)
   const token = getToken()
@@ -39,7 +48,7 @@ async function request(path, options = {}) {
 export const api = {
   login: (password) => request('/login', { method: 'POST', body: JSON.stringify({ password }) }),
   listPets: (params) => request(`/pets?${new URLSearchParams(params)}`),
-  createPet: (formData) => request('/pets', { method: 'POST', body: formData }),
-  updatePet: (id, formData) => request(`/pets/${id}`, { method: 'PUT', body: formData }),
+  createPet: (data) => request('/pets', { method: 'POST', body: petFormData(data) }),
+  updatePet: (id, data) => request(`/pets/${id}`, { method: 'PUT', body: petFormData(data) }),
   deletePet: (id) => request(`/pets/${id}`, { method: 'DELETE' })
 }

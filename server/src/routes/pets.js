@@ -1,13 +1,27 @@
 import { Router } from 'express'
-import { requireAuth } from '../middleware/auth.js'
+import crypto from 'node:crypto'
+import multer from 'multer'
 import { supabase } from '../lib/supabase.js'
 
 const router = Router()
 const allowedRarities = ['common', 'uncommon', 'rare', 'ultra_rare', 'legendary']
 const allowedCurrencies = ['PHP', 'USD']
 const sortable = { name: 'name', priceAsc: 'price', priceDesc: 'price', updated: 'updated_at' }
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 500 * 1024 }, fileFilter: (_req, file, callback) => callback(null, ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) })
 
-router.use(requireAuth)
+async function uploadImage(file) {
+  if (!file) return null
+  const extension = file.mimetype.split('/')[1].replace('jpeg', 'jpg')
+  const path = `${crypto.randomUUID()}.${extension}`
+  const { error } = await supabase.storage.from('pet-images').upload(path, file.buffer, { contentType: file.mimetype, upsert: false })
+  if (error) throw error
+  const { data } = supabase.storage.from('pet-images').getPublicUrl(path)
+  return { path, url: data.publicUrl }
+}
+
+async function removeImage(path) {
+  if (path) await supabase.storage.from('pet-images').remove([path])
+}
 
 function validatePet(body) {
   const name = String(body.name || '').trim()
@@ -61,29 +75,34 @@ router.get('/:id', async (req, res, next) => {
   } catch (error) { next(error) }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', upload.single('image'), async (req, res, next) => {
+  let image = null
   try {
     const validationError = validatePet(req.body)
     if (validationError) return res.status(400).json({ error: validationError })
-    const { data, error } = await supabase.from('pets').insert({ ...petFields(req.body), image_url: null, image_path: null }).select().single()
+    image = await uploadImage(req.file)
+    const { data, error } = await supabase.from('pets').insert({ ...petFields(req.body), image_url: image?.url || null, image_path: image?.path || null }).select().single()
     if (error) throw error
     res.status(201).json(data)
-  } catch (error) { next(error) }
+  } catch (error) { if (image?.path) await removeImage(image.path); next(error) }
 })
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', upload.single('image'), async (req, res, next) => {
+  let image = null
   try {
     const validationError = validatePet(req.body)
     if (validationError) return res.status(400).json({ error: validationError })
     const { data: existing, error: fetchError } = await supabase.from('pets').select('*').eq('id', req.params.id).single()
     if (fetchError?.code === 'PGRST116') return res.status(404).json({ error: 'Pet not found' })
     if (fetchError) throw fetchError
+    image = await uploadImage(req.file)
     const updates = { ...petFields(req.body) }
-    Object.assign(updates, { image_url: null, image_path: null })
+    if (image) Object.assign(updates, { image_url: image.url, image_path: image.path })
     const { data, error } = await supabase.from('pets').update(updates).eq('id', req.params.id).select().single()
     if (error) throw error
+    if (image && existing.image_path) await removeImage(existing.image_path)
     res.json(data)
-  } catch (error) { next(error) }
+  } catch (error) { if (image?.path) await removeImage(image.path); next(error) }
 })
 
 router.delete('/:id', async (req, res, next) => {
@@ -93,6 +112,7 @@ router.delete('/:id', async (req, res, next) => {
     if (fetchError) throw fetchError
     const { error } = await supabase.from('pets').delete().eq('id', req.params.id)
     if (error) throw error
+    await removeImage(existing.image_path)
     res.status(204).end()
   } catch (error) { next(error) }
 })
