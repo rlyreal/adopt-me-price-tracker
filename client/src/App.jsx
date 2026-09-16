@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { LogIn, LogOut, Plus, Search, SlidersHorizontal, PawPrint, ArrowDownUp, RefreshCw, X, Sparkles, ShieldCheck, LockKeyhole, ArrowDown, ExternalLink, Moon, Sun, CheckCircle2, LoaderCircle } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { LogIn, LogOut, Plus, Search, SlidersHorizontal, PawPrint, ArrowDownUp, RefreshCw, X, Sparkles, ShieldCheck, LockKeyhole, ArrowDown, ExternalLink, Moon, Sun, CheckCircle2, LoaderCircle, Play, Instagram, Github, Facebook } from 'lucide-react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { api, getToken, logout } from './lib/api.js'
 import Modal from './components/Modal.jsx'
@@ -7,6 +7,14 @@ import PetCard from './components/PetCard.jsx'
 import PetForm from './components/PetForm.jsx'
 
 const emptyFilters = { search: '', rarity: '', category: '', sort: 'updated' }
+
+function DiscordIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[22px] w-[22px] fill-current"><path d="M19.54 5.07a16.9 16.9 0 0 0-4.12-1.27.06.06 0 0 0-.06.03c-.18.32-.38.74-.52 1.07a15.6 15.6 0 0 0-5.68 0c-.14-.34-.34-.75-.53-1.07a.06.06 0 0 0-.06-.03c-1.46.25-2.84.68-4.12 1.27a.05.05 0 0 0-.02.02C1.8 9.22 1.08 13.26 1.44 17.25a.07.07 0 0 0 .03.05 16.97 16.97 0 0 0 5.08 2.54.07.07 0 0 0 .08-.03c.39-.54.74-1.1 1.04-1.69a.07.07 0 0 0-.04-.1 11.2 11.2 0 0 1-1.59-.76.07.07 0 0 1-.01-.11c.11-.08.22-.17.33-.25a.06.06 0 0 1 .06-.01c3.33 1.52 6.94 1.52 10.23 0a.06.06 0 0 1 .06.01c.11.08.22.17.33.25a.07.07 0 0 1-.01.11c-.51.3-1.04.55-1.59.76a.07.07 0 0 0-.04.1c.31.59.65 1.15 1.04 1.69a.07.07 0 0 0 .08.03 16.93 16.93 0 0 0 5.09-2.54.07.07 0 0 0 .03-.05c.43-4.62-.73-8.63-3.06-12.16a.05.05 0 0 0-.02-.02ZM8.02 14.7c-1 0-1.83-.92-1.83-2.05s.81-2.05 1.83-2.05c1.03 0 1.84.93 1.83 2.05 0 1.13-.81 2.05-1.83 2.05Zm7.96 0c-1.01 0-1.83-.92-1.83-2.05s.81-2.05 1.83-2.05c1.03 0 1.84.93 1.83 2.05 0 1.13-.81 2.05-1.83 2.05Z" /></svg>
+}
+
+function TikTokIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[22px] w-[22px] fill-current"><path d="M16.6 3c.2 1.7 1.2 2.8 2.9 2.9v2.8a7.2 7.2 0 0 1-2.9-.7v5.8a5.2 5.2 0 1 1-4.5-5.2v2.9a2.4 2.4 0 1 0 1.7 2.3V3h2.8Z" /></svg>
+}
 
 function useTheme() {
   const [theme, setTheme] = useState(() => localStorage.getItem('petfolio_theme') || 'light')
@@ -30,6 +38,8 @@ function Login() {
   const [modalOpen, setModalOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const [welcomeText, setWelcomeText] = useState('')
+  const [videoPlaying, setVideoPlaying] = useState(true)
+  const videoRef = useRef(null)
 
   useEffect(() => {
     const fullText = 'Welcome to Petfolio'
@@ -41,6 +51,12 @@ function Login() {
     }, 75)
     return () => clearInterval(timer)
   }, [])
+
+  const toggleVideo = () => {
+    if (!videoRef.current) return
+    if (videoRef.current.paused) videoRef.current.play().catch(() => {})
+    else videoRef.current.pause()
+  }
 
   useEffect(() => {
     const revealItems = document.querySelectorAll('[data-reveal]')
@@ -74,39 +90,98 @@ function Login() {
   }
 
   return (
-    <main className={`min-h-screen bg-canvas ${theme === 'dark' ? 'theme-dark' : ''}`}>
+    <main className={`min-h-screen bg-canvas ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
       <header className="flex items-center justify-between gap-4 bg-[#1f2326]/95 px-5 py-4 backdrop-blur sm:px-9">
         <div className="flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1f2326] text-mint"><PawPrint size={18} strokeWidth={2.5} /></span>
-          <span className="font-display text-xl font-extrabold text-white sm:text-2xl">Petfolio</span>
+          <div className="flex items-center gap-2">
+            <span className="font-display text-xl font-extrabold text-white sm:text-2xl">Petfolio</span>
+            <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#d5e7df]">v1.0.0</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <button className="flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#ff5f9d] to-[#e73d8b] px-5 py-3 font-bold text-white shadow-lg shadow-[#db4e8a]/25 transition hover:-translate-y-0.5" onClick={() => setModalOpen(true)}><LogIn size={17} /> Log in</button>
+          <button type="button" className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-b from-[#ff5f9d] to-[#e73d8b] px-3 py-2.5 pr-4 font-bold text-white shadow-lg shadow-[#db4e8a]/25 transition hover:-translate-y-0.5" onClick={() => setModalOpen(true)}>
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white"><LogIn size={16} /></span>
+            <span>Log in</span>
+          </button>
         </div>
       </header>
 
-      <section className="flex min-h-[calc(100vh-76px)] flex-col items-center justify-center bg-canvas px-5 pb-16 pt-10">
-        <div className="landing-reveal landing-reveal-up mb-5 text-center" data-reveal>
-          <p className="mb-2 text-xs font-extrabold uppercase tracking-[.16em] text-[#e73d8b]">Private collection</p>
-          <h1 className="landing-welcome-title font-display text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-[#1f2326]">{welcomeText}<span className="typing-caret" aria-hidden="true" /></h1>
-          <p className="landing-welcome-description mt-3 text-base text-[#687277]">Your calm corner for keeping every pet value in one place.</p>
+      <section className={`landing-hero ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
+        <video
+          ref={videoRef}
+          className="landing-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          onPlay={() => setVideoPlaying(true)}
+          onPause={() => setVideoPlaying(false)}
+          aria-hidden="true"
+        >
+          <source src="/videos/ADOPT%20ME!%20Official%20Game%20Trailer%20%F0%9F%90%BE.mp4" type="video/mp4" />
+        </video>
+        <div className="landing-video-overlay" aria-hidden="true" />
+        <button type="button" className="landing-video-toggle" onClick={toggleVideo} aria-label={videoPlaying ? 'Pause background video' : 'Play background video'} title={videoPlaying ? 'Pause background video' : 'Play background video'}>
+          {videoPlaying ? '||' : '▶'}
+        </button>
+        <div className="landing-hero-bg" aria-hidden="true">
+          <span className="orb orb-one" />
+          <span className="orb orb-two" />
+          <span className="orb orb-three" />
         </div>
 
-        <div className="landing-reveal landing-reveal-scale flex w-full max-w-[900px] items-center justify-center" data-reveal>
-          <img
-            src="/images/Front.png"
-            alt="Adopt Me style pet scene"
-            className="block w-full max-w-[820px] object-contain drop-shadow-[0_20px_30px_rgba(26,35,38,0.12)]"
-          />
+        <div className="landing-hero-inner">
+          <div className="landing-reveal landing-reveal-up hero-copy" data-reveal>
+            <p className="hero-kicker">Private collection</p>
+            <h1 className="landing-welcome-title font-display text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-[#1f2326]">{welcomeText}<span className="typing-caret" aria-hidden="true" /></h1>
+            <p className="landing-welcome-description mt-3 text-base text-[#687277]">Your polished collection hub for tracking pet values, keeping notes, and staying ready for your next big trade.</p>
+            <div className="hero-actions">
+              <a href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer" className="hero-primary hero-play-button">
+                <span className="hero-play-icon"><Play size={12} fill="currentColor" /></span>
+                <span>Play</span>
+              </a>
+              <a href="#features" className="hero-secondary">Explore features</a>
+            </div>
+          </div>
+
+          <div className="landing-reveal landing-reveal-scale hero-visual" data-reveal>
+            <div className="floating-card floating-card-main">
+              <span className="mini-label">Tracked pets</span>
+              <strong>3.2k</strong>
+              <small>Updated this week</small>
+            </div>
+
+            <img
+              src="/images/Front.png"
+              alt="Adopt Me style pet scene"
+              className="hero-image"
+            />
+
+            <div className="floating-card floating-card-secondary">
+              <span className="mini-label">Best value</span>
+              <strong>+18.4%</strong>
+              <small>Recent growth</small>
+            </div>
+          </div>
         </div>
 
-        <a className="group relative mt-6 inline-flex animate-float rounded-xl before:absolute before:inset-0 before:translate-y-3 before:rounded-xl before:border-4 before:border-white before:bg-white before:transition-transform before:duration-100 group-hover:before:translate-y-4 group-active:animate-none group-active:before:translate-y-0" href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer" aria-label="Open Roblox">
-          <img src="/images/button.png" alt="Unlock collection" className="relative z-10 block w-[180px] rounded-xl bg-white shadow-[0_8px_16px_rgba(0,0,0,0.12)] transition-transform duration-100 group-hover:-translate-y-1 group-active:translate-y-3" />
-        </a>
-
-        <p className="mt-3 text-xs text-[#687277]">A personal admin space · keep it yours</p>
+        <div className="landing-stats landing-reveal landing-reveal-up" data-reveal>
+          <div>
+            <span className="stat-number">1.2k</span>
+            <span className="stat-label">pet entries</span>
+          </div>
+          <div>
+            <span className="stat-number">96%</span>
+            <span className="stat-label">organization</span>
+          </div>
+          <div>
+            <span className="stat-number">24/7</span>
+            <span className="stat-label">collection access</span>
+          </div>
+        </div>
       </section>
 
       <div className="cloud-divider relative z-10 h-28 overflow-visible bg-transparent sm:h-36">
@@ -121,13 +196,13 @@ function Login() {
             <p className="mt-6 max-w-xl text-base leading-7 text-[#c7d0cd]">A private place to remember what your pets are worth, spot special variants, and stay ready when the next trade appears.</p>
             <a className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#ff5f9d] to-[#e73d8b] px-5 py-3 font-bold text-white shadow-lg shadow-[#db4e8a]/25 transition hover:-translate-y-1" href="#features">Explore Petfolio <ArrowDown size={17} /></a>
           </div>
-          <div className="landing-reveal landing-reveal-right relative rounded-[2rem] border border-white/10 bg-[#2a3033] p-3 shadow-2xl shadow-black/20" data-reveal>
-            <img src="/images/owner.png" alt="Petfolio collection artwork" className="h-72 w-full rounded-[1.5rem] object-cover object-center sm:h-96" />
+          <div className="landing-reveal landing-reveal-right relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-white/10 bg-[#2a3033] p-3 shadow-2xl shadow-black/20" data-reveal>
+            <img src="/images/owner.png" alt="Petfolio collection artwork" className="h-full w-full rounded-[1.5rem] object-cover object-center" />
           </div>
         </div>
       </section>
 
-      <div className="tree-divider relative z-10 -mt-24 mb-0 flex h-64 items-center justify-center overflow-hidden sm:-mt-32 sm:h-80">
+      <div className="tree-divider relative z-10 mt-0 mb-0 flex h-64 items-center justify-center overflow-hidden sm:mt-0 sm:h-80">
         <img src="/images/tree.png" alt="Decorative tree divider" className="relative z-10 h-full w-full max-w-none object-cover object-center" />
       </div>
 
@@ -164,7 +239,14 @@ function Login() {
             <div><p className="text-xs font-extrabold uppercase tracking-[.2em] text-[#ff5f9d]">Your pets are waiting</p><h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">Start your collection.</h2></div>
             <a className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#ff5f9d] to-[#e73d8b] px-6 py-3 font-bold text-white shadow-lg shadow-[#db4e8a]/25 transition hover:-translate-y-1" href="https://www.roblox.com/" target="_blank" rel="noopener noreferrer">Visit Roblox <ExternalLink size={17} /></a>
           </div>
-          <div className="flex flex-col justify-between gap-5 pt-8 text-sm text-[#aebbb6] sm:flex-row"><span className="font-display text-lg font-bold text-white">Petfolio</span><span>Private collection tracker · built for your Adopt Me journey</span></div>
+          <div className="flex flex-col justify-between gap-6 pt-8 text-sm text-[#aebbb6] sm:flex-row sm:items-center"><div><span className="font-display text-lg font-bold text-white">Petfolio</span><span className="ml-3">Private collection tracker · built for your Adopt Me journey</span></div><div className="flex items-center gap-3" aria-label="Social links">
+            <a className="flex h-11 w-11 items-center justify-center rounded-full bg-[#7289da] text-white transition hover:-translate-y-1 hover:brightness-110" href="https://discord.com/users/853873666285633536" target="_blank" rel="noopener noreferrer" aria-label="Discord"><DiscordIcon /></a>
+            <a className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f00073] text-white transition hover:-translate-y-1 hover:brightness-110" href="https://www.instagram.com/_rlyreal" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Instagram size={23} /></a>
+            <a className="flex h-11 w-11 items-center justify-center rounded-full bg-[#24292f] text-white transition hover:-translate-y-1 hover:brightness-125" href="https://github.com/rlyreal" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><Github size={22} /></a>
+            <a className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1877f2] text-white transition hover:-translate-y-1 hover:brightness-110" href="https://www.facebook.com/realjhon.palacio.14/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><Facebook size={22} fill="currentColor" /></a>
+            <a className="flex h-11 w-11 items-center justify-center rounded-full bg-black text-white ring-1 ring-white/20 transition hover:-translate-y-1 hover:brightness-125" href="https://www.tiktok.com/@real.adoptmeph?_r=1&_t=ZS-99lyIrGcru1" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><TikTokIcon /></a>
+          </div></div>
+          <p className="mt-5 text-xs text-[#84918d]">© 2026 <a className="underline decoration-[#84918d] underline-offset-2 transition hover:text-white" href="https://uplift.games/" target="_blank" rel="noopener noreferrer">Uplift Games LLC.</a> All Rights Reserved.</p>
         </div>
       </footer>
 
@@ -198,7 +280,7 @@ function Login() {
 
               <button className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-b from-[#ff5f9d] to-[#e73d8b] font-bold text-white shadow-lg shadow-[#db4e8a]/25 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-wait disabled:opacity-[.65]" disabled={loading}>
                 <LogIn size={18} />
-                {loading ? 'Checking...' : 'Unlock collection'}
+                {loading ? 'Checking...' : 'Login'}
               </button>
             </form>
           </div>
@@ -234,31 +316,37 @@ function Dashboard() {
   const signOut = () => setModal({ type: 'edit', pet: { __logout: true, name: 'Log out?' } })
     return (
       <div className={`app-shell ${theme === 'dark' ? 'theme-dark' : ''}`}>
-        <header className="topbar !h-auto !bg-[#1f2326] !px-[clamp(1.2rem,3vw,2.2rem)] !py-[1.1rem] text-white">
-          <div className="brand !gap-3 !font-display !text-[clamp(1.2rem,2vw,2rem)] !font-extrabold">
-            <span className="brand-icon !h-9 !w-9 !rounded-xl !bg-[#1f2326] text-mint"><PawPrint size={18} /></span>
+        <header className="topbar premium-topbar">
+          <div className="brand premium-brand">
+            <span className="brand-icon premium-brand-icon"><PawPrint size={18} /></span>
             <span>Petfolio</span>
           </div>
           <div className="topbar-right">
-            <span className="hidden text-sm text-[#b8c9c0] sm:inline">Private price tracker</span>
+            <span className="topbar-label">Private price tracker</span>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
-            <button className="flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#ff5f9d] to-[#e73d8b] px-4 py-2.5 font-bold text-white shadow-lg shadow-[#db4e8a]/25 transition hover:-translate-y-0.5" onClick={signOut}>
+            <button className="logout-button premium-logout" onClick={signOut}>
               <LogOut size={16} /> Log out
             </button>
           </div>
         </header>
-        <main className="page-wrap">
-          <section className="hero-row">
-            <div>
+        <main className="page-wrap dashboard-wrap">
+          <section className="dashboard-hero premium-panel">
+            <div className="hero-copy-wrap">
               <p className="eyebrow">Your collection</p>
               <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Pet values, <span className="text-coral">beautifully</span> kept.</h1>
               <p className="mt-3 max-w-xl text-sm leading-6 text-moss sm:text-base">A living snapshot of your Adopt Me collection, ready whenever a trade comes up.</p>
+              <div className="hero-actions-row">
+                <button className="button button-primary shrink-0" onClick={() => setModal({ type: 'add' })}>
+                  <Plus size={18} /> Add pet
+                </button>
+                <button className="button button-quiet premium-soft-button" title="Refresh collection" onClick={loadPets}>
+                  <RefreshCw size={17} /> Refresh
+                </button>
+              </div>
             </div>
-            <button className="button button-primary shrink-0" onClick={() => setModal({ type: 'add' })}>
-              <Plus size={18} /> Add pet
-            </button>
           </section>
-          <section className="stat-strip">
+
+          <section className="stat-strip premium-stat-strip">
             <div>
               <span className="stat-number">{pets.length}</span>
               <span className="stat-label">Showing pets</span>
@@ -274,13 +362,14 @@ function Dashboard() {
               <span className="stat-label">Special variants</span>
             </div>
             <div className="ml-auto hidden sm:block">
-              <button className="icon-button" title="Refresh collection" onClick={loadPets}>
+              <button className="icon-button premium-icon-button" title="Refresh collection" onClick={loadPets}>
                 <RefreshCw size={17} />
               </button>
             </div>
           </section>
-          <section className="toolbar">
-            <div className="search-wrap">
+
+          <section className="toolbar premium-toolbar">
+            <div className="search-wrap premium-search-wrap">
               <Search size={18} />
               <input value={filters.search} onChange={(e) => updateFilter('search', e.target.value)} placeholder="Search your pets..." />
               <button className="clear-search" onClick={() => updateFilter('search', '')} hidden={!filters.search}>
@@ -288,7 +377,7 @@ function Dashboard() {
               </button>
             </div>
             <div className="filter-row">
-              <div className="select-wrap">
+              <div className="select-wrap premium-select-wrap">
                 <SlidersHorizontal size={15} />
                 <select value={filters.rarity} onChange={(e) => updateFilter('rarity', e.target.value)}>
                   <option value="">All rarities</option>
@@ -299,7 +388,7 @@ function Dashboard() {
                   <option value="legendary">Legendary</option>
                 </select>
               </div>
-              <div className="select-wrap">
+              <div className="select-wrap premium-select-wrap">
                 <select value={filters.category} onChange={(e) => updateFilter('category', e.target.value)}>
                   <option value="">All variants</option>
                   <option value="neon">Neon</option>
@@ -309,7 +398,7 @@ function Dashboard() {
                   <option value="fly_ride">Fly + Ride</option>
                 </select>
               </div>
-              <div className="select-wrap">
+              <div className="select-wrap premium-select-wrap">
                 <ArrowDownUp size={15} />
                 <select value={filters.sort} onChange={(e) => updateFilter('sort', e.target.value)}>
                   <option value="updated">Recently updated</option>
@@ -321,18 +410,18 @@ function Dashboard() {
             </div>
           </section>
           {loading ? (
-            <div className="empty-state">
+            <div className="empty-state premium-empty-state">
               <RefreshCw className="animate-spin text-coral" />
               <p>Gathering your collection...</p>
             </div>
           ) : pets.length ? (
-            <div className="pet-grid">
+            <div className="pet-grid premium-pet-grid">
               {pets.map((pet) => (
                 <PetCard key={pet.id} pet={pet} onEdit={(selected) => setModal({ type: 'edit', pet: selected })} onDelete={handleDelete} />
               ))}
             </div>
           ) : (
-            <div className="empty-state">
+            <div className="empty-state premium-empty-state">
               <div className="empty-icon"><PawPrint size={27} /></div>
               <h2 className="font-display text-2xl font-bold text-ink">No pets here yet</h2>
               <p className="max-w-xs text-center text-sm leading-6 text-moss">{filters.search || filters.rarity || filters.category ? 'Try adjusting your filters to find what you are looking for.' : 'Add your first pet and start building your collection.'}</p>
